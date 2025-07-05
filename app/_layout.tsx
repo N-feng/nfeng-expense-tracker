@@ -1,29 +1,76 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import { persistor, store } from "@/redux/store";
+import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { useEffect } from "react";
+import { SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { LogLevel, OneSignal } from "react-native-onesignal";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+// Prevent the splash screen from auto-hiding
+SplashScreen.preventAutoHideAsync();
+
+// Setting the animation options
+SplashScreen.setOptions({
+  duration: 1000,
+  fade: true,
+});
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
+  useEffect(() => {
+    // One Signal Enabling verbose logging for debugging
+    OneSignal.Debug.setLogLevel(LogLevel.Verbose);
+    // Initializing with OneSignal App ID
+    console.log("OneSignal App ID:", process.env.EXPO_ONE_SIGNAL_APP_ID);
+    OneSignal.initialize("7a7bb505-d9c7-4366-9e85-7051fbfd2b90");
+    // //This method to prompt for push notifications. Removing in production and use in app messaging
+    // OneSignal.Notifications.requestPermission(true);
+    // Hide the splash screen after a short delay or when your app is ready
+    const hideSplash = async () => {
+      await SplashScreen.hideAsync();
+    };
 
-  if (!loaded) {
-    // Async font loading only occurs in development.
-    return null;
-  }
+    hideSplash();
+  }, []);
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <Provider store={store}>
+      <SafeAreaProvider>
+        <PersistGate
+          loading={
+            <SafeAreaView style={styles.container}>
+              <View style={styles.loadingContainer}>
+                <Text style={styles.loadingText}>Loading...</Text>
+              </View>
+            </SafeAreaView>
+          }
+          persistor={persistor}
+        >
+          <SafeAreaView style={styles.container}>
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="(tabs)" />
+              <Stack.Screen name="(auth)" />
+            </Stack>
+          </SafeAreaView>
+        </PersistGate>
+      </SafeAreaProvider>
+    </Provider>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    fontSize: 16,
+    color: "#666",
+  },
+});

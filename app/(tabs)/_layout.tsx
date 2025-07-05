@@ -1,45 +1,64 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
+// app/(tabs)/_layout.tsx
+import { colors } from '@/constants/theme';
+import { RootState } from '@/redux/store';
+import CustomRoutes from '@/routes/CustomRoutes';
+import { MaterialIcons } from '@expo/vector-icons';
+import Feather from '@expo/vector-icons/Feather';
+import { Redirect, Tabs } from 'expo-router';
+import { useSelector } from 'react-redux';
 
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+export default function TabsLayout() {
+  const token = useSelector((state: RootState) => state.auth.token);
+  if (!token) {
+    return <Redirect href="/(auth)/login" />;
+  }
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
-      }}>
+      }}
+      tabBar={(props) => (
+        <CustomRoutes
+          {...props}
+          activeTintColor={colors.primary.dark}
+          inactiveTintColor={colors.primary.lighter}
+        />
+      )}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: 'Acceuil',
+          tabBarIcon: ({ color, size }) => (
+            // <MaterialIcons name="home" size={size} color={color} />
+            <Feather name="home" size={size} color={color} />
+          ),
         }}
       />
+
+
       <Tabs.Screen
-        name="explore"
+        name="payments"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: 'Paiements',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialIcons name="payments" size={size} color={color} />
+          ),
         }}
       />
+
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: 'Paramètres',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialIcons name="settings" size={size} color={color} />
+          ),
+        }}
+      />
+
+
     </Tabs>
   );
 }
