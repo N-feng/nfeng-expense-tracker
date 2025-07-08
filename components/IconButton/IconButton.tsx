@@ -1,13 +1,16 @@
 // components/ui/IconButton.tsx
-import { colors, componentSizes, radius, shadows, spacingX, spacingY } from '@/constants/theme';
-import { scale } from '@/utils/stylings';
-import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
 import {
-    GestureResponderEvent,
-    Pressable,
-    ViewStyle
-} from 'react-native';
+  colors,
+  componentSizes,
+  radius,
+  shadows,
+  spacingX,
+  spacingY,
+} from "@/constants/theme";
+import { scale } from "@/utils/styling";
+import { Ionicons } from "@expo/vector-icons";
+import React from "react";
+import { GestureResponderEvent, Pressable, ViewStyle } from "react-native";
 
 // Icon button props interface
 interface IconButtonProps {
@@ -15,20 +18,20 @@ interface IconButtonProps {
   iconName: keyof typeof Ionicons.glyphMap;
   iconSize?: keyof typeof componentSizes.icon;
   iconColor?: string;
-  
+
   // Button props
-  size?: 'sm' | 'md' | 'lg' | 'xl';
-  variant?: 'filled' | 'outlined' | 'ghost' | 'rounded';
-  color?: 'primary' | 'secondary' | 'success' | 'error' | 'warning';
+  size?: "sm" | "md" | "lg" | "xl";
+  variant?: "filled" | "outlined" | "ghost" | "rounded";
+  color?: "primary" | "secondary" | "success" | "error" | "warning";
   disabled?: boolean;
-  
+
   // Styling
   style?: ViewStyle;
-  
+
   // Events
   onPress?: (event: GestureResponderEvent) => void;
   onLongPress?: (event: GestureResponderEvent) => void;
-  
+
   // Accessibility
   accessibilityLabel?: string;
   accessibilityHint?: string;
@@ -36,11 +39,11 @@ interface IconButtonProps {
 
 export const IconButton: React.FC<IconButtonProps> = ({
   iconName,
-  iconSize = 'md',
+  iconSize = "md",
   iconColor,
-  size = 'md',
-  variant = 'filled',
-  color = 'primary',
+  size = "md",
+  variant = "filled",
+  color = "primary",
   disabled = false,
   style,
   onPress,
@@ -51,31 +54,31 @@ export const IconButton: React.FC<IconButtonProps> = ({
   // Get colors based on color prop
   const getColors = () => {
     switch (color) {
-      case 'primary':
+      case "primary":
         return {
           main: colors.primary.main,
           light: colors.primary.light,
           dark: colors.primary.dark,
         };
-      case 'secondary':
+      case "secondary":
         return {
           main: colors.secondary.main,
           light: colors.secondary.light,
           dark: colors.secondary.dark,
         };
-      case 'success':
+      case "success":
         return {
           main: colors.success.main,
           light: colors.success.light,
           dark: colors.success.dark,
         };
-      case 'error':
+      case "error":
         return {
           main: colors.error.main,
           light: colors.error.light,
           dark: colors.error.dark,
         };
-      case 'warning':
+      case "warning":
         return {
           main: colors.warning.main,
           light: colors.warning.light,
@@ -95,13 +98,13 @@ export const IconButton: React.FC<IconButtonProps> = ({
   // Get button size
   const getButtonSize = () => {
     switch (size) {
-      case 'sm':
+      case "sm":
         return scale(32);
-      case 'md':
+      case "md":
         return scale(40);
-      case 'lg':
+      case "lg":
         return scale(48);
-      case 'xl':
+      case "xl":
         return scale(56);
       default:
         return scale(40);
@@ -114,34 +117,34 @@ export const IconButton: React.FC<IconButtonProps> = ({
     const baseStyle: ViewStyle = {
       width: buttonSize,
       height: buttonSize,
-      justifyContent: 'center',
-      alignItems: 'center',
+      justifyContent: "center",
+      alignItems: "center",
       opacity: disabled ? 0.6 : pressed ? 0.8 : 1,
     };
 
     switch (variant) {
-      case 'filled':
+      case "filled":
         return {
           ...baseStyle,
           backgroundColor: pressed ? colorScheme.dark : colorScheme.main,
           borderRadius: radius._10,
           ...shadows.sm,
         };
-      case 'outlined':
+      case "outlined":
         return {
           ...baseStyle,
-          backgroundColor: 'transparent',
+          backgroundColor: "transparent",
           borderWidth: 2,
           borderColor: pressed ? colorScheme.dark : colorScheme.main,
           borderRadius: radius._10,
         };
-      case 'ghost':
+      case "ghost":
         return {
           ...baseStyle,
-          backgroundColor: pressed ? `${colorScheme.main}20` : 'transparent',
+          backgroundColor: pressed ? `${colorScheme.main}20` : "transparent",
           borderRadius: radius._10,
         };
-      case 'rounded':
+      case "rounded":
         return {
           ...baseStyle,
           backgroundColor: pressed ? colorScheme.dark : colorScheme.main,
@@ -156,13 +159,13 @@ export const IconButton: React.FC<IconButtonProps> = ({
   // Get icon color based on variant
   const getIconColor = () => {
     if (iconColor) return iconColor;
-    
+
     switch (variant) {
-      case 'filled':
-      case 'rounded':
+      case "filled":
+      case "rounded":
         return colors.text.white;
-      case 'outlined':
-      case 'ghost':
+      case "outlined":
+      case "ghost":
         return colorScheme.main;
       default:
         return colorScheme.main;
@@ -171,10 +174,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
 
   return (
     <Pressable
-      style={({ pressed }) => [
-        getButtonStyle(pressed),
-        style,
-      ]}
+      style={({ pressed }) => [getButtonStyle(pressed), style]}
       onPress={onPress}
       onLongPress={onLongPress}
       disabled={disabled}
@@ -193,47 +193,47 @@ export const IconButton: React.FC<IconButtonProps> = ({
 };
 
 // Specialized icon button variants for common use cases
-export const PrimaryIconButton: React.FC<Omit<IconButtonProps, 'color' | 'variant'>> = (props) => (
-  <IconButton {...props} color="primary" variant="filled" />
-);
+export const PrimaryIconButton: React.FC<
+  Omit<IconButtonProps, "color" | "variant">
+> = (props) => <IconButton {...props} color="primary" variant="filled" />;
 
-export const SecondaryIconButton: React.FC<Omit<IconButtonProps, 'color' | 'variant'>> = (props) => (
-  <IconButton {...props} color="secondary" variant="filled" />
-);
+export const SecondaryIconButton: React.FC<
+  Omit<IconButtonProps, "color" | "variant">
+> = (props) => <IconButton {...props} color="secondary" variant="filled" />;
 
-export const GhostIconButton: React.FC<Omit<IconButtonProps, 'variant'>> = (props) => (
-  <IconButton {...props} variant="ghost" />
-);
+export const GhostIconButton: React.FC<Omit<IconButtonProps, "variant">> = (
+  props
+) => <IconButton {...props} variant="ghost" />;
 
-export const RoundedIconButton: React.FC<Omit<IconButtonProps, 'variant'>> = (props) => (
-  <IconButton {...props} variant="rounded" />
-);
+export const RoundedIconButton: React.FC<Omit<IconButtonProps, "variant">> = (
+  props
+) => <IconButton {...props} variant="rounded" />;
 
 // Floating Action Button (FAB)
 interface FABProps {
   iconName: keyof typeof Ionicons.glyphMap;
   onPress: (event: GestureResponderEvent) => void;
-  size?: 'sm' | 'md' | 'lg';
-  color?: 'primary' | 'secondary' | 'success' | 'error';
-  position?: 'bottom-right' | 'bottom-left' | 'bottom-center';
+  size?: "sm" | "md" | "lg";
+  color?: "primary" | "secondary" | "success" | "error";
+  position?: "bottom-right" | "bottom-left" | "bottom-center";
   style?: ViewStyle;
 }
 
 export const FloatingActionButton: React.FC<FABProps> = ({
   iconName,
   onPress,
-  size = 'md',
-  color = 'primary',
-  position = 'bottom-right',
+  size = "md",
+  color = "primary",
+  position = "bottom-right",
   style,
 }) => {
   const getFABSize = () => {
     switch (size) {
-      case 'sm':
+      case "sm":
         return scale(48);
-      case 'md':
+      case "md":
         return scale(56);
-      case 'lg':
+      case "lg":
         return scale(64);
       default:
         return scale(56);
@@ -242,17 +242,17 @@ export const FloatingActionButton: React.FC<FABProps> = ({
 
   const getPositionStyle = (): ViewStyle => {
     const base = {
-      position: 'absolute' as const,
+      position: "absolute" as const,
       bottom: spacingY._20,
     };
 
     switch (position) {
-      case 'bottom-right':
+      case "bottom-right":
         return { ...base, right: spacingX._20 };
-      case 'bottom-left':
+      case "bottom-left":
         return { ...base, left: spacingX._20 };
-      case 'bottom-center':
-        return { ...base, alignSelf: 'center' as const };
+      case "bottom-center":
+        return { ...base, alignSelf: "center" as const };
       default:
         return { ...base, right: spacingX._20 };
     }
@@ -267,11 +267,9 @@ export const FloatingActionButton: React.FC<FABProps> = ({
           width: fabSize,
           height: fabSize,
           borderRadius: fabSize / 2,
-          backgroundColor: pressed 
-            ? colors[color].dark 
-            : colors[color].main,
-          justifyContent: 'center',
-          alignItems: 'center',
+          backgroundColor: pressed ? colors[color].dark : colors[color].main,
+          justifyContent: "center",
+          alignItems: "center",
           ...shadows.lg,
           opacity: pressed ? 0.9 : 1,
         },
