@@ -15,9 +15,9 @@ const StackLayout = () => {
 export default function RootLayout() {
   return (
     <AuthProvider>
-      <WalletProvider>
-        <StackLayout />
-      </WalletProvider>
+      {/* <WalletProvider> */}
+      <StackLayout />
+      {/* </WalletProvider> */}
     </AuthProvider>
   );
 }

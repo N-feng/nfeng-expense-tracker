@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Alert, StyleSheet, Text, View } from "react-native";
 import React from "react";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import { colors, spacingX, spacingY } from "@/constants/theme";
@@ -13,24 +13,27 @@ import { useAuth } from "@/contexts/authContext";
 
 const Register = () => {
   const emailRef = React.useRef("");
+  const passwordRef = React.useRef("");
   const nameRef = React.useRef("");
-  const passordRef = React.useRef("");
-  const [loading, setLoading] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
   const router = useRouter();
   const { register: registerUser } = useAuth();
 
   const handleSumbit = async () => {
-    setLoading(true);
+    if (!emailRef.current || !passwordRef.current || !nameRef.current) {
+      Alert.alert("Sign up", "Please fill all the fields");
+      return;
+    }
+    setIsLoading(true);
     const res = await registerUser(
       emailRef.current,
-      passordRef.current,
+      passwordRef.current,
       nameRef.current
     );
-    setLoading(false);
-    if (res.success) {
-      router.navigate("/auth/login");
-    } else {
-      alert(res.msg);
+    setIsLoading(false);
+    console.log("register result: ", res);
+    if (!res.success) {
+      Alert.alert("Sign up", res.msg);
     }
   };
 
@@ -70,11 +73,11 @@ const Register = () => {
             }
             placeholder="Enter your password"
             secureTextEntry
-            onChangeText={(value) => (passordRef.current = value)}
+            onChangeText={(value) => (passwordRef.current = value)}
           />
         </View>
         {/* button */}
-        <Button onPress={handleSumbit} loading={loading}>
+        <Button onPress={handleSumbit} loading={isLoading}>
           <Typo
             size={verticalScale(16)}
             fontWeight={"500"}
@@ -86,10 +89,10 @@ const Register = () => {
 
         {/* footer */}
         <View style={styles.footer}>
-          <Link href={"/auth/login"}>
+          {/* <Link href={"/auth/login"}>
             <Text style={styles.footerText}> Already have an account? </Text>
             <Text style={styles.footerLinkText}>Login</Text>
-          </Link>
+          </Link> */}
         </View>
       </View>
     </ScreenWrapper>

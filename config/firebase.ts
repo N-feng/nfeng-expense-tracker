@@ -3,9 +3,24 @@ import { initializeApp } from "firebase/app";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
-import { initializeAuth, getReactNativePersistence } from "firebase/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getReactNativePersistence, initializeAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+
+console.log(
+  "process.env.EXPO_PUBLIC_FIREBASE_API_KEY: ",
+  process.env.EXPO_PUBLIC_FIREBASE_API_KEY
+);
+
+console.log(
+  "process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN: ",
+  process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN
+);
+
+console.log(
+  "process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID: ",
+  process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID
+);
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -16,8 +31,8 @@ const firebaseConfig = {
   storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
-  measurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID,
-  databaseURL: process.env.EXPO_PUBLIC_FIREBASE_DATABASE_URL,
+  // measurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID,
+  // databaseURL: process.env.EXPO_PUBLIC_FIREBASE_DATABASE_URL,
 };
 
 // Initialize Firebase

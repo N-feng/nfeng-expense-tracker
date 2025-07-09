@@ -1,64 +1,19 @@
-// app/(tabs)/_layout.tsx
-import { colors } from '@/constants/theme';
-import { RootState } from '@/redux/store';
-import CustomRoutes from '@/routes/CustomRoutes';
-import { MaterialIcons } from '@expo/vector-icons';
-import Feather from '@expo/vector-icons/Feather';
-import { Redirect, Tabs } from 'expo-router';
-import { useSelector } from 'react-redux';
+import TabBar from "@/components/TabBar";
+import { Tabs } from "expo-router";
+import React from "react";
 
-export default function TabsLayout() {
-  const token = useSelector((state: RootState) => state.auth.token);
-  if (!token) {
-    return <Redirect href="/(auth)/login" />;
-  }
-
+const _layout = () => {
   return (
     <Tabs
-      screenOptions={{
-        headerShown: false,
-      }}
-      tabBar={(props) => (
-        <CustomRoutes
-          {...props}
-          activeTintColor={colors.primary.dark}
-          inactiveTintColor={colors.primary.lighter}
-        />
-      )}
+      tabBar={(props) => <TabBar {...props} />}
+      screenOptions={{ headerShown: false }}
     >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Acceuil',
-          tabBarIcon: ({ color, size }) => (
-            // <MaterialIcons name="home" size={size} color={color} />
-            <Feather name="home" size={size} color={color} />
-          ),
-        }}
-      />
-
-
-      <Tabs.Screen
-        name="payments"
-        options={{
-          title: 'Paiements',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="payments" size={size} color={color} />
-          ),
-        }}
-      />
-
-      <Tabs.Screen
-        name="settings"
-        options={{
-          title: 'Paramètres',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="settings" size={size} color={color} />
-          ),
-        }}
-      />
-
-
+      <Tabs.Screen name="index" />
+      <Tabs.Screen name="wallet" />
+      <Tabs.Screen name="statistics" />
+      <Tabs.Screen name="profile" />
     </Tabs>
   );
-}
+};
+
+export default _layout;
