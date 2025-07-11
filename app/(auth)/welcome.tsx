@@ -17,10 +17,11 @@ const Welcome = () => {
         <View>
           <TouchableOpacity
             style={styles.loginButton}
-            onPress={() => router.push("/auth/login")}
+            onPress={() => router.push("/(auth)/login")}
           >
             <Typo fontWeight={"500"}>Sign In</Typo>
           </TouchableOpacity>
+
           <Animated.Image
             entering={FadeIn.duration(1000)}
             source={require("../../assets/images/welcome.png")}
@@ -49,12 +50,8 @@ const Welcome = () => {
               .damping(12)}
             style={{ alignItems: "center", gap: 2 }}
           >
-            <Typo size={17} color={colors.textLight}>
-              Finances must be arranged to set better
-            </Typo>
-            <Typo size={17} color={colors.textLight}>
-              lifestyle in future
-            </Typo>
+            <Typo size={16}>Finances must be arranged to set better</Typo>
+            <Typo size={16}>lifestyle in future</Typo>
           </Animated.View>
 
           {/* button */}
@@ -67,7 +64,7 @@ const Welcome = () => {
           >
             <Button
               onPress={() => {
-                router.push("/auth/register");
+                router.push("/(auth)/register");
               }}
             >
               <Typo size={22} color={colors.neutral900} fontWeight={"600"}>

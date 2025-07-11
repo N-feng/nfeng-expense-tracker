@@ -1,15 +1,17 @@
-import { Alert, StyleSheet, Text, View } from "react-native";
-import React from "react";
-import ScreenWrapper from "@/components/ScreenWrapper";
-import { colors, spacingX, spacingY } from "@/constants/theme";
-import { Ionicons } from "@expo/vector-icons";
-import { verticalScale } from "@/utils/styling";
 import BackButton from "@/components/BackButton";
-import Typo from "@/components/Typo";
-import Input from "@/components/Input";
 import Button from "@/components/Button";
+import Input from "@/components/Input";
+import ScreenWrapper from "@/components/ScreenWrapper";
+import Typo from "@/components/Typo";
+import { colors, spacingX, spacingY } from "@/constants/theme";
+import { verticalScale } from "@/utils/styling";
 import { Link, useRouter } from "expo-router";
+import * as Icons from "phosphor-react-native";
+import React from "react";
+import { Alert, StyleSheet, Text, View } from "react-native";
+
 import { useAuth } from "@/contexts/authContext";
+import { Ionicons } from "@expo/vector-icons";
 
 const Register = () => {
   const emailRef = React.useRef("");
@@ -19,7 +21,7 @@ const Register = () => {
   const router = useRouter();
   const { register: registerUser } = useAuth();
 
-  const handleSumbit = async () => {
+  const handleSubmit = async () => {
     if (!emailRef.current || !passwordRef.current || !nameRef.current) {
       Alert.alert("Sign up", "Please fill all the fields");
       return;
@@ -40,30 +42,36 @@ const Register = () => {
   return (
     <ScreenWrapper>
       <View style={styles.container}>
-        {/* back button	 */}
         <BackButton iconSize={28} />
 
         <View style={{ gap: 5, marginTop: spacingY._20 }}>
-          <Typo fontWeight={"700"} size={24}>
-            Singn Up
+          <Typo size={30} fontWeight={"800"}>
+            Let's
           </Typo>
-          <Typo fontWeight={"500"}>welcome to expense tracker </Typo>
+          <Typo size={30} fontWeight={"800"}>
+            welcome to expense tracker{" "}
+          </Typo>
         </View>
+
+        <Typo size={16} color={colors.textLighter}>
+          Create an account to track your expenses
+        </Typo>
         {/* form */}
         <View style={styles.form}>
           <Input
-            icon={
-              <Ionicons name="person" size={24} color={colors.neutral800} />
-            }
-            placeholder="Enter your Name"
+            placeholder="Enter your name"
             onChangeText={(value) => (nameRef.current = value)}
+            icon={<Icons.User size={24} color={colors.neutral800} />}
           />
           <Input
-            icon={<Ionicons name="mail" size={24} color={colors.neutral800} />}
             placeholder="Enter your email"
             onChangeText={(value) => (emailRef.current = value)}
+            icon={<Ionicons name="mail" size={24} color={colors.neutral800} />}
           />
           <Input
+            placeholder="Enter your password"
+            secureTextEntry
+            onChangeText={(value) => (passwordRef.current = value)}
             icon={
               <Ionicons
                 name="lock-closed"
@@ -71,13 +79,10 @@ const Register = () => {
                 color={colors.neutral800}
               />
             }
-            placeholder="Enter your password"
-            secureTextEntry
-            onChangeText={(value) => (passwordRef.current = value)}
           />
         </View>
         {/* button */}
-        <Button onPress={handleSumbit} loading={isLoading}>
+        <Button onPress={handleSubmit} loading={isLoading}>
           <Typo
             size={verticalScale(16)}
             fontWeight={"500"}
@@ -89,10 +94,10 @@ const Register = () => {
 
         {/* footer */}
         <View style={styles.footer}>
-          {/* <Link href={"/auth/login"}>
+          <Link href={"/(auth)/login"}>
             <Text style={styles.footerText}> Already have an account? </Text>
             <Text style={styles.footerLinkText}>Login</Text>
-          </Link> */}
+          </Link>
         </View>
       </View>
     </ScreenWrapper>
