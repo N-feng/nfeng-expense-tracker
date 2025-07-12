@@ -1,11 +1,13 @@
 import { auth, firestore } from "@/config/firebase";
 import { AuthContextType, UserType } from "@/types";
 import { doc, getDoc, setDoc } from "@firebase/firestore";
+import { useRouter } from "expo-router";
 import {
   createUserWithEmailAndPassword,
+  onAuthStateChanged,
   signInWithEmailAndPassword,
 } from "firebase/auth";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
@@ -13,26 +15,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [user, setUser] = useState<UserType>(null);
-  // const router = useRouter();
+  const router = useRouter();
 
-  // useEffect(() => {
-  //   const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-  //     if (firebaseUser) {
-  //       setUser({
-  //         uid: firebaseUser.uid,
-  //         email: firebaseUser.email,
-  //         name: firebaseUser.displayName,
-  //       });
-  //       updateUserData(firebaseUser.uid);
-  //       router.replace("/(tabs)");
-  //     } else {
-  //       // user is signed out
-  //       setUser(null);
-  //       router.replace("/auth/welcome");
-  //     }
-  //   });
-  //   return () => unsubscribe();
-  // }, []);
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      // console.log("firebase user: ", firebaseUser);
+      if (firebaseUser) {
+        setUser({
+          uid: firebaseUser.uid,
+          email: firebaseUser.email,
+          name: firebaseUser.displayName,
+        });
+        updateUserData(firebaseUser.uid);
+        router.replace("/(tabs)");
+      } else {
+        // no user
+        setUser(null);
+        router.replace("/(auth)/welcome");
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   const login = async (email: string, password: string) => {
     try {
@@ -40,13 +43,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       return { success: true };
     } catch (error: any) {
       let msg = error.message;
+      console.log("error message: ", msg);
+      if (msg.includes("(auth)/invalid-credential")) msg = "Wrong credentials";
+      if (msg.includes("(auth)/invalid-email")) msg = "Invalid email";
       return { success: false, msg };
     }
   };
 
   const register = async (email: string, password: string, name: string) => {
     try {
-      const response = await createUserWithEmailAndPassword(
+      let response = await createUserWithEmailAndPassword(
         auth,
         email,
         password
@@ -59,6 +65,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       return { success: true };
     } catch (error: any) {
       let msg = error.message;
+      console.log("error message: ", msg);
+      if (msg.includes("(auth)/invalid-already-in-use"))
+        msg = "This email is already in use";
+      if (msg.includes("(auth)/invalid-email")) msg = "Invalid email";
       return { success: false, msg };
     }
   };

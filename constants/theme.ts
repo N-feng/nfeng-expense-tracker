@@ -1,5 +1,5 @@
-import { StyleSheet } from "react-native";
 import { scale, verticalScale } from "@/utils/styling";
+import { StyleSheet } from "react-native";
 
 // Default text style that will be applied app-wide
 const defaultText = {
@@ -21,6 +21,7 @@ export const colors = {
   neutral50: "#fafafa",
   neutral100: "#f5f5f5",
   neutral200: "#e5e5e5",
+  neutral300: "#d4d4d4",
   neutral350: "#CCCCCC",
   neutral400: "#a3a3a3",
   neutral500: "#737373",

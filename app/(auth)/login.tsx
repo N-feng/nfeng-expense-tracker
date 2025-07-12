@@ -6,25 +6,25 @@ import Typo from "@/components/Typo";
 import { colors, spacingX, spacingY } from "@/constants/theme";
 import { useAuth } from "@/contexts/authContext";
 import { verticalScale } from "@/utils/styling";
-import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import * as Icons from "phosphor-react-native";
 import React, { useRef, useState } from "react";
-import { Alert, StyleSheet, Text, View } from "react-native";
+import { Alert, Pressable, StyleSheet, View } from "react-native";
 
 const Login = () => {
   const emailRef = useRef("");
-  const passordRef = useRef("");
+  const passwordRef = useRef("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { login: loginUser } = useAuth();
 
-  const handleSumbit = async () => {
-    if (!emailRef.current || !passordRef.current) {
+  const handleSubmit = async () => {
+    if (!emailRef.current || !passwordRef.current) {
       Alert.alert("Login", "Please fill all the fields");
       return;
     }
     setIsLoading(true);
-    const res = await loginUser(emailRef.current, passordRef.current);
+    const res = await loginUser(emailRef.current, passwordRef.current);
     setIsLoading(false);
     if (res.success) {
       router.navigate("/(tabs)");
@@ -36,54 +36,64 @@ const Login = () => {
   return (
     <ScreenWrapper>
       <View style={styles.container}>
-        {/* back button	 */}
         <BackButton iconSize={28} />
 
         <View style={{ gap: 5, marginTop: spacingY._20 }}>
-          <Typo fontWeight={"700"} size={24}>
-            Sign In
+          <Typo size={30} fontWeight={"800"}>
+            Hey,
           </Typo>
-          <Typo fontWeight={"500"}>Enter your email and password</Typo>
+          <Typo size={30} fontWeight={"800"}>
+            Welcome back!
+          </Typo>
         </View>
+
         {/* form */}
+
         <View style={styles.form}>
+          <Typo size={16}>Login now to track all your expenses</Typo>
           <Input
-            icon={<Ionicons name="mail" size={24} color={colors.neutral800} />}
             placeholder="Enter your email"
             onChangeText={(value) => (emailRef.current = value)}
-          />
-          <Input
             icon={
-              <Ionicons
-                name="lock-closed"
-                size={24}
-                color={colors.neutral800}
+              <Icons.At
+                size={verticalScale(26)}
+                color={colors.neutral300}
+                weight="fill"
               />
             }
+          />
+          <Input
             placeholder="Enter your password"
             secureTextEntry
-            onChangeText={(value) => (passordRef.current = value)}
+            onChangeText={(value) => (passwordRef.current = value)}
+            icon={
+              <Icons.Lock
+                size={verticalScale(26)}
+                color={colors.neutral300}
+                weight="fill"
+              />
+            }
           />
-        </View>
-        {/* forgot password */}
-        <Text style={styles.forgotPassword}>Forgot Password?</Text>
-        {/* button */}
-        <Button onPress={handleSumbit} loading={isLoading}>
-          <Typo
-            size={verticalScale(16)}
-            fontWeight={"500"}
-            color={colors.neutral800}
-          >
-            Login
+
+          <Typo size={14} color={colors.text} style={{ alignSelf: "flex-end" }}>
+            Forgot Password?
           </Typo>
-        </Button>
+
+          <Button onPress={handleSubmit} loading={isLoading}>
+            <Typo fontWeight={"700"} color={colors.black} size={21}>
+              Login
+            </Typo>
+          </Button>
+        </View>
 
         {/* footer */}
         <View style={styles.footer}>
-          {/* <Link href={"/auth/register"}>
-            <Text style={styles.footerText}>Don't have an account? </Text>
-            <Text style={styles.footerLinkText}>Register</Text>
-          </Link> */}
+          <Typo size={15}>Don't have an account? </Typo>
+          <Pressable onPress={() => router.navigate("/(auth)/register")}>
+            <Typo size={15} fontWeight={"700"} color={colors.primary}>
+              Sign up
+            </Typo>
+          </Pressable>
         </View>
       </View>
     </ScreenWrapper>

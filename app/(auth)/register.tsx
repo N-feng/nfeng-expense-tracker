@@ -5,10 +5,10 @@ import ScreenWrapper from "@/components/ScreenWrapper";
 import Typo from "@/components/Typo";
 import { colors, spacingX, spacingY } from "@/constants/theme";
 import { verticalScale } from "@/utils/styling";
-import { Link, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import * as Icons from "phosphor-react-native";
 import React from "react";
-import { Alert, StyleSheet, Text, View } from "react-native";
+import { Alert, Pressable, StyleSheet, View } from "react-native";
 
 import { useAuth } from "@/contexts/authContext";
 import { Ionicons } from "@expo/vector-icons";
@@ -49,15 +49,14 @@ const Register = () => {
             Let's
           </Typo>
           <Typo size={30} fontWeight={"800"}>
-            welcome to expense tracker{" "}
+            Get Started
           </Typo>
         </View>
 
-        <Typo size={16} color={colors.textLighter}>
-          Create an account to track your expenses
-        </Typo>
         {/* form */}
+
         <View style={styles.form}>
+          <Typo size={16}>Create an account to track your expenses</Typo>
           <Input
             placeholder="Enter your name"
             onChangeText={(value) => (nameRef.current = value)}
@@ -66,7 +65,13 @@ const Register = () => {
           <Input
             placeholder="Enter your email"
             onChangeText={(value) => (emailRef.current = value)}
-            icon={<Ionicons name="mail" size={24} color={colors.neutral800} />}
+            icon={
+              <Icons.At
+                size={verticalScale(26)}
+                color={colors.neutral300}
+                weight="fill"
+              />
+            }
           />
           <Input
             placeholder="Enter your password"
@@ -81,23 +86,21 @@ const Register = () => {
             }
           />
         </View>
-        {/* button */}
-        <Button onPress={handleSubmit} loading={isLoading}>
-          <Typo
-            size={verticalScale(16)}
-            fontWeight={"500"}
-            color={colors.neutral800}
-          >
-            Register
+
+        <Button loading={isLoading} onPress={handleSubmit}>
+          <Typo fontWeight={"700"} color={colors.black} size={21}>
+            Sign up
           </Typo>
         </Button>
 
         {/* footer */}
         <View style={styles.footer}>
-          <Link href={"/(auth)/login"}>
-            <Text style={styles.footerText}> Already have an account? </Text>
-            <Text style={styles.footerLinkText}>Login</Text>
-          </Link>
+          <Typo size={15}> Already have an account? </Typo>
+          <Pressable onPress={() => router.push("/(auth)/login")}>
+            <Typo size={15} fontWeight={"700"} color={colors.primary}>
+              Login
+            </Typo>
+          </Pressable>
         </View>
       </View>
     </ScreenWrapper>
