@@ -6,7 +6,10 @@ import React from "react";
 const StackLayout = () => {
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      {/* <Stack.Screen name="(modals)/profileModal" options={{ presentation: 'modal' }} /> */}
+      <Stack.Screen
+        name="(modals)/profileModal"
+        options={{ presentation: "modal" }}
+      />
       <Stack.Screen name="(transactions)/addTransaction" />
     </Stack>
   );

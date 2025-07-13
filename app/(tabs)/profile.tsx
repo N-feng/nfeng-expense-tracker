@@ -1,100 +1,96 @@
-import Header from "@/components/Header";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React from "react";
 import ScreenWrapper from "@/components/ScreenWrapper";
-import Typo from "@/components/Typo";
-import { auth } from "@/config/firebase";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
-import { useAuth } from "@/contexts/authContext";
-import { getProfileImage } from "@/services/imagesService";
-import { UserDataType } from "@/types";
 import { verticalScale } from "@/utils/styling";
-import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import Header from "@/components/Header";
+import BackButton from "@/components/BackButton";
+import Typo from "@/components/Typo";
+import { useAuth } from "@/contexts/authContext";
+import { Image } from "expo-image";
+import { getProfileImage } from "@/services/imageService";
+import { CaretRight, GearSix, Lock, Power, User } from "phosphor-react-native";
+import { accountOptionType } from "@/types";
+import Animated, { FadeInDown } from "react-native-reanimated";
+import { signOut } from "firebase/auth";
+import { auth } from "@/config/firebase";
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
-import { Image, Platform, StyleSheet, View } from "react-native";
 
-const MENU_ITEMS = [
-  {
-    icon: <AntDesign name="user" size={24} color={colors.primary} />,
-    title: "Edit Profile",
-    route: "(modals)/profileModal",
-  },
-  {
-    icon: (
-      <MaterialIcons name="favorite-border" size={24} color={colors.primary} />
-    ),
-    title: "Favourites",
-    route: "favourites",
-  },
-  {
-    icon: <MaterialIcons name="privacy-tip" size={24} color={colors.primary} />,
-    title: "Privacy & Policy",
-    route: "privacyAndPolicy",
-  },
-  {
-    icon: <Ionicons name="settings-outline" size={24} color={colors.primary} />,
-    title: "Settings",
-    route: "settings",
-  },
-];
-
-const ProfileScreen = () => {
+const Profile = () => {
+  const { user } = useAuth();
   const router = useRouter();
-  const isIOS = Platform.OS === "ios";
-  const { user, updateUserData } = useAuth();
-  const [userData, setUserData] = useState<UserDataType>({
-    name: "",
-    image: null,
-  });
+
+  const accountOptions: accountOptionType[] = [
+    {
+      title: "Edit Profile",
+      icon: <User size={26} color={colors.white} weight="fill" />,
+      routeName: "/(modals)/profileModal",
+      bgColor: "#6366f1",
+    },
+    {
+      title: "Settings",
+      icon: <GearSix size={26} color={colors.white} weight="fill" />,
+      // routeName: "/(modals)/profile",
+      bgColor: "#059669",
+    },
+    {
+      title: "Privacy Policy",
+      icon: <Lock size={26} color={colors.white} weight="fill" />,
+      // routeName: "/(modals)/profile",
+      bgColor: colors.neutral600,
+    },
+    {
+      title: "Logout",
+      icon: <Power size={26} color={colors.white} weight="fill" />,
+      // routeName: "/(modals)/profile",
+      bgColor: "#e11d48",
+    },
+  ];
 
   const handleLogout = async () => {
-    await auth.signOut();
+    await signOut(auth);
   };
 
-  useEffect(() => {
-    if (user) {
-      setUserData((prevState) => ({
-        ...prevState,
-        image: user.image || null,
-        name: user.name || "",
-      }));
+  const showLogoutAlert = () => {
+    Alert.alert("Confirm", "Are you sure you want to logout?", [
+      {
+        text: "Cancel",
+        onPress: () => console.log("Cancel logout"),
+        style: "cancel",
+      },
+      {
+        text: "Logout",
+        onPress: () => handleLogout(),
+        style: "destructive",
+      },
+    ]);
+  };
+
+  const handlePress = (item: accountOptionType) => {
+    if (item.title == "Logout") {
+      showLogoutAlert();
     }
-  }, [user]);
 
-  const renderProfileImage = () => {
-    const imageSource = userData.image
-      ? {
-          uri:
-            typeof userData.image === "string"
-              ? userData.image
-              : userData.image.uri,
-        }
-      : getProfileImage(null);
-
-    return (
-      <Image source={imageSource} style={styles.avatar} resizeMode="cover" />
-    );
+    if (item.routeName) router.push(item.routeName);
   };
-
   return (
     <ScreenWrapper>
       <View style={styles.container}>
-        <Header title="Profile" style={{ marginTop: spacingY._10 }} />
-
-        {/* user info */}
+        <Header title="Profile" style={{ marginVertical: spacingY._10 }} />
+        {/* user info  */}
         <View style={styles.userInfo}>
-          {/* avatar */}
+          {/* avatar  */}
           <View>
-            {/* user image */}
             <Image
               source={getProfileImage(user?.image)}
+              contentFit="cover"
+              transition={100}
               style={styles.avatar}
-              resizeMode="cover"
-              // transition={100}
             />
           </View>
-          {/* name & email */}
+          {/* name & email  */}
           <View style={styles.nameContainer}>
-            <Typo size={24} fontWeight={"600"}>
+            <Typo size={24} fontWeight={"600"} color={colors.neutral100}>
               {user?.name}
             </Typo>
             <Typo size={15} color={colors.neutral400}>
@@ -102,10 +98,49 @@ const ProfileScreen = () => {
             </Typo>
           </View>
         </View>
+
+        {/* account options  */}
+        <View style={styles.accountOptions}>
+          {accountOptions.map((item, index) => (
+            <Animated.View
+              key={index.toString()}
+              entering={FadeInDown.delay(index * 50)
+                .springify()
+                .damping(14)}
+              style={styles.listItem}
+            >
+              <TouchableOpacity
+                onPress={() => handlePress(item)}
+                style={styles.flexRow}
+              >
+                <View
+                  style={[
+                    styles.listIcon,
+                    {
+                      backgroundColor: item?.bgColor,
+                    },
+                  ]}
+                >
+                  {item.icon && item.icon}
+                </View>
+                <Typo size={16} style={{ flex: 1 }} fontWeight={"500"}>
+                  {item.title}
+                </Typo>
+                <CaretRight
+                  size={verticalScale(20)}
+                  weight="bold"
+                  color={colors.white}
+                />
+              </TouchableOpacity>
+            </Animated.View>
+          ))}
+        </View>
       </View>
     </ScreenWrapper>
   );
 };
+
+export default Profile;
 
 const styles = StyleSheet.create({
   container: {
@@ -127,8 +162,6 @@ const styles = StyleSheet.create({
     height: verticalScale(135),
     width: verticalScale(135),
     borderRadius: 200,
-    // overflow: "hidden",
-    // position: "relative",
   },
   editIcon: {
     position: "absolute",
@@ -168,5 +201,3 @@ const styles = StyleSheet.create({
     gap: spacingX._10,
   },
 });
-
-export default ProfileScreen;
