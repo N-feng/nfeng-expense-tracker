@@ -3,7 +3,7 @@ import {
   collection,
   onSnapshot,
   query,
-  QueryConstraint
+  QueryConstraint,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
 
@@ -45,4 +45,3 @@ const useFetchData = <T>(
 };
 
 export default useFetchData;
-

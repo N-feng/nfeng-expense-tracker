@@ -1,12 +1,7 @@
-import { Href } from "expo-router";
-import { Firestore, Timestamp } from "firebase/firestore";
+import { Timestamp } from "firebase/firestore";
 import { Icon } from "phosphor-react-native";
 import React, { ReactNode } from "react";
 import {
-  ActivityIndicator,
-  ActivityIndicatorProps,
-  ImageStyle,
-  PressableProps,
   TextInput,
   TextInputProps,
   TextProps,
@@ -108,9 +103,8 @@ export interface InputProps extends TextInputProps {
   containerStyle?: ViewStyle;
   inputStyle?: TextStyle;
   inputRef?: React.RefObject<TextInput>;
-  value?: string | undefined;
-  label?: string;
-  error?: string;
+  //   label?: string;
+  //   error?: string;
 }
 
 export interface CustomButtonProps extends TouchableOpacityProps {

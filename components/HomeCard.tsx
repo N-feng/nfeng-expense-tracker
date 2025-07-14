@@ -2,12 +2,12 @@ import { colors, spacingX, spacingY } from "@/constants/theme";
 import { useAuth } from "@/contexts/authContext";
 import useFetchData from "@/hooks/useFetchData";
 import { WalletType } from "@/types";
-import { formatRupiah } from "@/utils/currency";
 import { scale, verticalScale } from "@/utils/styling";
+import { ImageBackground } from "expo-image";
 import { orderBy, where } from "firebase/firestore";
 import * as Icons from "phosphor-react-native";
 import React from "react";
-import { ImageBackground, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import Typo from "./Typo";
 
 const HomeCard = () => {
@@ -42,7 +42,6 @@ const HomeCard = () => {
     >
       <View style={styles.container}>
         <View>
-          {/* total balance */}
           <View style={styles.totalBalanceRow}>
             <Typo color={colors.neutral800} size={17} fontWeight={"500"}>
               Total Balance
@@ -54,13 +53,10 @@ const HomeCard = () => {
             />
           </View>
           <Typo color={colors.black} size={30} fontWeight={"bold"}>
-            {walletLoading ? "----" : formatRupiah(getTotals()?.balance)}
+            $ {walletLoading ? "----" : getTotals()?.balance?.toFixed(2)}
           </Typo>
         </View>
-
-        {/* expense and income */}
         <View style={styles.stats}>
-          {/* income */}
           <View style={{ gap: verticalScale(5) }}>
             <View style={styles.incomeExpense}>
               <View style={styles.statsIcon}>
@@ -74,13 +70,13 @@ const HomeCard = () => {
                 Income
               </Typo>
             </View>
-            <View style={{ alignSelf: "center" }}>
+            <View style={{ alignItems: "center" }}>
               <Typo size={17} color={colors.green} fontWeight={"600"}>
-                {walletLoading ? "----" : formatRupiah(getTotals()?.income)}
+                $ {walletLoading ? "----" : getTotals()?.income?.toFixed(2)}
               </Typo>
             </View>
           </View>
-          {/* expense */}
+
           <View style={{ gap: verticalScale(5) }}>
             <View style={styles.incomeExpense}>
               <View style={styles.statsIcon}>
@@ -94,9 +90,9 @@ const HomeCard = () => {
                 Expense
               </Typo>
             </View>
-            <View style={{ alignSelf: "center" }}>
+            <View style={{ alignItems: "center" }}>
               <Typo size={17} color={colors.rose} fontWeight={"600"}>
-                {walletLoading ? "----" : formatRupiah(getTotals()?.expenses)}
+                $ {walletLoading ? "----" : getTotals()?.expenses?.toFixed(2)}
               </Typo>
             </View>
           </View>
@@ -109,26 +105,9 @@ const HomeCard = () => {
 export default HomeCard;
 
 const styles = StyleSheet.create({
-  incomeExpense: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacingY._7,
-  },
-  statsIcon: {
-    backgroundColor: colors.neutral350,
-    padding: spacingY._5,
-    borderRadius: 50,
-  },
-  stats: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  totalBalanceRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: spacingY._5,
+  bgImage: {
+    height: scale(210),
+    width: "100%",
   },
   container: {
     padding: spacingX._20,
@@ -137,8 +116,25 @@ const styles = StyleSheet.create({
     width: "100%",
     justifyContent: "space-between",
   },
-  bgImage: {
-    height: scale(210),
-    width: "100%",
+  totalBalanceRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: spacingY._5,
+  },
+  stats: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  statsIcon: {
+    backgroundColor: colors.neutral350,
+    padding: spacingY._5,
+    borderRadius: 50,
+  },
+  incomeExpense: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacingY._7,
   },
 });

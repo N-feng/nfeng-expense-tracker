@@ -1,58 +1,41 @@
-import { colors, radius, spacingX } from "@/constants/theme";
-import { WalletType } from "@/types";
-import { formatRupiah } from "@/utils/currency";
-import { verticalScale } from "@/utils/styling";
-import { Image } from "expo-image";
-import { Router } from "expo-router";
-import * as Icons from "phosphor-react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import { WalletType } from "@/types";
+import { verticalScale } from "@/utils/styling";
+import { colors, radius, spacingX } from "@/constants/theme";
+import { CaretRight, Wallet } from "phosphor-react-native";
 import Typo from "./Typo";
+import Animated, { FadeInDown } from "react-native-reanimated";
+import { useRouter } from "expo-router";
 
-const WalletListItem = ({
-  item,
-  index,
-  router,
-}: {
-  item: WalletType;
-  index: number;
-  router: Router;
-}) => {
+const WalletCard = ({ item, index }: { item: WalletType; index: number }) => {
+  const router = useRouter();
   const openWallet = () => {
     router.push({
       pathname: "/(modals)/walletModal",
       params: {
         id: item?.id,
         name: item?.name,
-        image: item?.image,
       },
     });
   };
-
   return (
     <Animated.View
       entering={FadeInDown.delay(index * 50)
         .springify()
         .damping(13)}
     >
-      <TouchableOpacity style={styles.container} onPress={openWallet}>
+      <TouchableOpacity onPress={openWallet} style={styles.container}>
         <View style={styles.imageContainer}>
-          <Image
-            style={{ flex: 1 }}
-            source={item?.image}
-            contentFit="cover"
-            transition={100}
-          />
+          <Wallet size={verticalScale(30)} color={colors.white} />
         </View>
         <View style={styles.nameContainer}>
           <Typo size={16}>{item?.name}</Typo>
-          <Typo size={14} color={colors.neutral400}>
-            {formatRupiah(item?.amount || 0)}
+          <Typo size={16} color={colors.neutral400}>
+            {item?.amount} {item?.amount && item?.amount > 0 ? "Kyats" : "Kyat"}
           </Typo>
         </View>
-
-        <Icons.CaretRight
+        <CaretRight
           size={verticalScale(20)}
           weight="bold"
           color={colors.white}
@@ -62,7 +45,7 @@ const WalletListItem = ({
   );
 };
 
-export default WalletListItem;
+export default WalletCard;
 
 const styles = StyleSheet.create({
   container: {
@@ -71,9 +54,13 @@ const styles = StyleSheet.create({
     marginBottom: verticalScale(17),
   },
   imageContainer: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
     height: verticalScale(45),
     width: verticalScale(45),
     borderWidth: 1,
+    backgroundColor: colors.black,
     borderColor: colors.neutral600,
     borderRadius: radius._12,
     borderCurve: "continuous",
@@ -82,6 +69,6 @@ const styles = StyleSheet.create({
   nameContainer: {
     flex: 1,
     gap: 2,
-    marginLeft: spacingX._10,
+    marginLeft: spacingX._20,
   },
 });

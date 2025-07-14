@@ -10,6 +10,7 @@ import {
   where,
   writeBatch,
 } from "firebase/firestore";
+import { uploadFileToCloudinary } from "./imageService";
 
 export const createOrUpdateWallet = async (
   walletData: Partial<WalletType>
@@ -17,24 +18,36 @@ export const createOrUpdateWallet = async (
   try {
     let walletToSave = { ...walletData };
 
-    //for new wallet
+    if (walletData.image) {
+      const imageUploadRes = await uploadFileToCloudinary(
+        walletData.image,
+        "wallets"
+      );
+      if (!imageUploadRes.success) {
+        return {
+          success: false,
+          msg: imageUploadRes.msg || "Failed to upload wallet icon",
+        };
+      }
+      walletToSave.image = imageUploadRes.data;
+    }
+
     if (!walletData?.id) {
+      // new wallet
       walletToSave.amount = 0;
-      walletToSave.totalExpenses = 0;
       walletToSave.totalIncome = 0;
+      walletToSave.totalExpenses = 0;
       walletToSave.created = new Date();
     }
 
-    //determine create or update
     const walletRef = walletData?.id
-      ? doc(firestore, "wallets", walletData.id)
+      ? doc(firestore, "wallets", walletData?.id)
       : doc(collection(firestore, "wallets"));
 
-    //merge: true mean updates only the data provided
-    await setDoc(walletRef, walletToSave, { merge: true });
+    await setDoc(walletRef, walletToSave, { merge: true }); //updates only the data provided
     return { success: true, data: { ...walletToSave, id: walletRef.id } };
   } catch (error: any) {
-    console.log("Error upserting wallet");
+    console.log("error creating or updating wallet: ", error);
     return { success: false, msg: error.message };
   }
 };
@@ -42,28 +55,51 @@ export const createOrUpdateWallet = async (
 export const deleteWallet = async (walletId: string): Promise<ResponseType> => {
   try {
     const walletRef = doc(firestore, "wallets", walletId);
-    //TODO: delete related transactions
-    //1. Get all related transactions
-    const transactionsRef = collection(firestore, "transactions");
-    const q = query(transactionsRef, where("walletId", "==", walletId));
-    const transactionSnapshots = await getDocs(q);
+    await deleteDoc(walletRef);
+    deleteTransactionByWalletId(walletId);
+    return { success: true, msg: "Wallet deleted successfully" };
+  } catch (err: any) {
+    console.log("error deleting wallet: ", err);
+    return { success: false, msg: err.message };
+  }
+};
+export const deleteTransactionByWalletId = async (
+  walletId: string
+): Promise<ResponseType> => {
+  try {
+    let hasMoreTransaction = true;
 
-    //2. Batch delete
-    const batch = writeBatch(firestore);
-    transactionSnapshots.forEach((doc) => {
-      batch.delete(doc.ref);
-    });
+    while (hasMoreTransaction) {
+      const transactionsQuery = query(
+        collection(firestore, "transactions"),
+        where("walletId", "==", walletId)
+      );
 
-    //3. Delete the wallet
-    batch.delete(walletRef);
-    await batch.commit();
+      const transactionSnapshot = await getDocs(transactionsQuery);
+      if (transactionSnapshot.size === 0) {
+        hasMoreTransaction = false;
+        break;
+      }
+
+      const batch = writeBatch(firestore);
+
+      transactionSnapshot.forEach((transactionDoc) => {
+        batch.delete(transactionDoc.ref);
+      });
+
+      await batch.commit();
+
+      console.log(
+        `${transactionSnapshot.size} transaction deleted in this batch`
+      );
+    }
 
     return {
       success: true,
-      msg: "Wallet and related transactions deleted successfully",
+      msg: "All transaction deleted successfully",
     };
-  } catch (error: any) {
-    console.log("Error deleting wallet");
-    return { success: false, msg: error.message };
+  } catch (err: any) {
+    console.log("error deleting wallet: ", err);
+    return { success: false, msg: err.message };
   }
 };
