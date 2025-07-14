@@ -1,86 +1,86 @@
-import {
-  ActivityIndicator,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import React, { useEffect, useState } from "react";
+import Button from "@/components/Button";
+import HomeCard from "@/components/HomeCard";
 import ScreenWrapper from "@/components/ScreenWrapper";
-import { colors, spacingX } from "@/constants/theme";
-import ProfileChip from "@/components/ProfileChip";
-import { Ionicons } from "@expo/vector-icons";
-import { useAuth } from "@/contexts/authContext";
-import StatCard from "@/components/StatCard";
+import TransactionList from "@/components/TransactionList";
 import Typo from "@/components/Typo";
-import { useWallet } from "@/contexts/wallet";
-import { FloatingAction } from "react-native-floating-action";
-import { router } from "expo-router";
+import { colors, spacingX, spacingY } from "@/constants/theme";
+import { useAuth } from "@/contexts/authContext";
+import useFetchData from "@/hooks/useFetchData";
+import { TransactionType } from "@/types";
+import { verticalScale } from "@/utils/styling";
+import { useRouter } from "expo-router";
+import { limit, orderBy, where } from "firebase/firestore";
+import * as Icons from "phosphor-react-native";
+import React from "react";
+import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 
 const Home = () => {
   const { user } = useAuth();
-  const { wallet, fetchWallets } = useWallet();
-  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-  useEffect(() => {
-    const loadWallets = async () => {
-      setIsLoading(true);
-      try {
-        await fetchWallets();
-      } catch (error) {
-        console.error("Error loading wallets:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const constraints = [
+    where("uid", "==", user?.uid),
+    orderBy("date", "desc"),
+    limit(30),
+  ];
 
-    loadWallets();
-  }, []);
-
-  if (isLoading) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" color={colors.neutral600} />
-      </View>
-    );
-  }
+  const {
+    data: recentTransaction,
+    error,
+    loading: transactionLoading,
+  } = useFetchData<TransactionType>("transactions", constraints);
 
   return (
     <ScreenWrapper>
       <View style={styles.container}>
-        <ProfileChip
-          imageUrl={user?.image}
-          name={user?.name}
-          message="Hello"
-          rightIcon={
-            <Ionicons
-              name="notifications"
-              size={24}
-              color={colors.neutral800}
+        {/* header */}
+        <View style={styles.header}>
+          <View style={{ gap: 4 }}>
+            <Typo size={16} color={colors.neutral400}>
+              Hello,
+            </Typo>
+            <Typo size={20} fontWeight={"500"}>
+              {user?.name}
+            </Typo>
+          </View>
+          <TouchableOpacity
+            onPress={() => router.push("/(modals)/searchModal")}
+            style={styles.searchIcon}
+          >
+            <Icons.MagnifyingGlass
+              size={verticalScale(22)}
+              color={colors.neutral200}
+              weight="bold"
             />
-          }
-        />
-        <View style={styles.stateCardsContainer}>
-          <View style={styles.balanceContainer}>
-            <View style={styles.balance}>
-              <Typo fontWeight={"500"} size={14} color={colors.neutral500}>
-                Balance
-              </Typo>
-              <Typo fontWeight={"500"} size={14} color={colors.neutral500}>
-                ${wallet?.amount || 0}
-              </Typo>
-            </View>
-          </View>
-          <View style={styles.stateCards}>
-            <StatCard type="Income" amount={wallet?.totalIncome || 0} />
-            <StatCard type="Expense" amount={wallet?.totalExpenses || 0} />
-          </View>
+          </TouchableOpacity>
         </View>
-        {/* <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => router.push("/(transactions)/addTransaction")}
+
+        <ScrollView
+          contentContainerStyle={styles.scrollViewStyle}
+          showsVerticalScrollIndicator={false}
         >
-          <Ionicons name="add" size={24} color={colors.white} />
-        </TouchableOpacity> */}
+          {/* card */}
+          <View>
+            <HomeCard />
+          </View>
+
+          <TransactionList
+            data={recentTransaction}
+            loading={transactionLoading}
+            emptyListMessage="No Transactions added yet!"
+            title="Recent Transactions"
+          />
+        </ScrollView>
+        <Button
+          style={styles.floatingButton}
+          onPress={() => router.push("/(modals)/transactionModal")}
+        >
+          <Icons.Plus
+            color={colors.black}
+            weight="bold"
+            size={verticalScale(24)}
+          />
+        </Button>
       </View>
     </ScreenWrapper>
   );
@@ -89,34 +89,33 @@ const Home = () => {
 export default Home;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  scrollViewStyle: {
+    marginTop: spacingY._10,
+    paddingBottom: verticalScale(100),
+    gap: spacingY._25,
   },
-  stateCardsContainer: {
-    paddingHorizontal: spacingX._20,
-    marginTop: 20,
+  floatingButton: {
+    height: verticalScale(50),
+    width: verticalScale(50),
+    borderRadius: 100,
+    position: "absolute",
+    bottom: verticalScale(30),
+    right: verticalScale(30),
   },
-  balanceContainer: {
-    marginBottom: 16, // Add some spacing between balance and stat cards
+  searchIcon: {
+    backgroundColor: colors.neutral700,
+    padding: spacingX._10,
+    borderRadius: 50,
   },
-  balance: {
+  header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: spacingY._10,
   },
-  stateCards: {
-    flexDirection: "row",
-    gap: 10,
-  },
-  addButton: {
-    position: "absolute",
-    bottom: 100,
-    right: 20,
-    width: 60,
-    height: 60,
-    backgroundColor: colors.primary,
-    borderRadius: 30,
-    justifyContent: "center",
-    alignItems: "center",
+  container: {
+    flex: 1,
+    paddingHorizontal: spacingX._20,
+    marginTop: verticalScale(8),
   },
 });

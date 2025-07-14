@@ -1,179 +1,116 @@
-import { StyleSheet, Text, View, TouchableOpacity, FlatList } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import ScreenWrapper from '@/components/ScreenWrapper'
-import { colors, spacingX, spacingY } from '@/constants/theme'
-import { useWallet, WalletType } from '@/contexts/wallet'
-import { useRouter } from 'expo-router'
-import { Ionicons } from '@expo/vector-icons'
-import Typo from '@/components/Typo'
-import { verticalScale } from '@/utils/styling'
+import Loading from "@/components/Loading";
+import ScreenWrapper from "@/components/ScreenWrapper";
+import Typo from "@/components/Typo";
+import WalletListItem from "@/components/WalletListItem";
+import { colors, radius, spacingX, spacingY } from "@/constants/theme";
+import { useAuth } from "@/contexts/authContext";
+import useFetchData from "@/hooks/useFetchData";
+import { WalletType } from "@/types";
+import { formatRupiah } from "@/utils/currency";
+import { verticalScale } from "@/utils/styling";
+import { useRouter } from "expo-router";
+import { orderBy, where } from "firebase/firestore";
+import * as Icons from "phosphor-react-native";
+import React from "react";
+import { FlatList, StyleSheet, TouchableOpacity, View } from "react-native";
 
-const WalletScreen = () => {
-	const { wallets, setWallet, wallet } = useWallet()
-	const router = useRouter()
-	const [isLoading, setIsLoading] = useState(false)
+const Wallet = () => {
+  const router = useRouter();
+  const { user } = useAuth();
 
-	const handleCreateWallet = () => {
-		router.push('/(modals)/createWalletModal')
-	}
+  const {
+    data: wallets,
+    error,
+    loading,
+  } = useFetchData<WalletType>("wallets", [
+    where("uid", "==", user?.uid),
+    orderBy("created", "desc"),
+  ]);
 
-	const renderWalletCard = ({ item }: { item: WalletType }) => (
-		<TouchableOpacity
-			style={[
-				styles.walletCard,
-				wallet?.id === item.id && styles.selectedWallet
-			]}
-			onPress={() => setWallet(item)}
-		>
-			<View style={styles.walletHeader}>
-				<View style={styles.walletIcon}>
-					<Ionicons name="wallet-outline" size={24} color={colors.neutral800} />
-				</View>
-				<Typo fontWeight="600" size={18}>{item.name}</Typo>
-			</View>
+  const getTotalBalance = () =>
+    wallets.reduce((total, item) => {
+      total = total + (item.amount || 0);
+      return total;
+    }, 0);
 
-			<View style={styles.walletBalance}>
-				<Typo fontWeight="500" color={colors.neutral600} size={14}>Balance</Typo>
-				<Typo fontWeight="700" size={24}>${item.amount?.toFixed(2) || '0.00'}</Typo>
-			</View>
+  return (
+    <ScreenWrapper style={{ backgroundColor: colors.black }}>
+      <View style={styles.container}>
+        {/* balance view */}
+        <View style={styles.balaceView}>
+          <View style={{ alignItems: "center" }}>
+            <Typo size={45} fontWeight={"500"}>
+              {formatRupiah(getTotalBalance())}
+            </Typo>
+            <Typo size={16} color={colors.neutral300}>
+              Total Balance
+            </Typo>
+          </View>
+        </View>
 
-			<View style={styles.walletStats}>
-				<View style={styles.statItem}>
-					<Typo color={colors.green} fontWeight="600" size={16}>
-						+${item.totalIncome?.toFixed(2) || '0.00'}
-					</Typo>
-					<Typo color={colors.neutral600} size={12}>Income</Typo>
-				</View>
-				<View style={styles.statItem}>
-					<Typo color={colors.rose} fontWeight="600" size={16}>
-						-${item.totalExpenses?.toFixed(2) || '0.00'}
-					</Typo>
-					<Typo color={colors.neutral600} size={12}>Expense</Typo>
-				</View>
-			</View>
-		</TouchableOpacity>
-	)
+        {/* wallets */}
+        <View style={styles.wallets}>
+          {/* header */}
+          <View style={styles.flexRow}>
+            <Typo size={20} fontWeight={"500"}>
+              My Wallets
+            </Typo>
+            <TouchableOpacity
+              onPress={() => router.push("/(modals)/walletModal")}
+            >
+              <Icons.PlusCircle
+                weight="fill"
+                color={colors.primary}
+                size={verticalScale(33)}
+              />
+            </TouchableOpacity>
+          </View>
 
-	return (
-		<ScreenWrapper>
-			<View style={styles.container}>
-				<View style={styles.header}>
-					<Typo fontWeight="700" size={24}>My Wallets</Typo>
-					<TouchableOpacity
-						style={styles.addButton}
-						onPress={handleCreateWallet}
-					>
-						<Ionicons name="add" size={24} color={colors.white} />
-					</TouchableOpacity>
-				</View>
+          {loading && <Loading />}
+          <FlatList
+            data={wallets}
+            renderItem={({ item, index }) => {
+              return (
+                <WalletListItem item={item} index={index} router={router} />
+              );
+            }}
+            contentContainerStyle={styles.listStyle}
+          />
+        </View>
+      </View>
+    </ScreenWrapper>
+  );
+};
 
-				{wallets.length === 0 ? (
-					<View style={styles.emptyContainer}>
-						<Ionicons name="wallet-outline" size={60} color={colors.neutral500} />
-						<Typo color={colors.neutral600} size={18} style={styles.emptyText}>
-							No wallets found
-						</Typo>
-						<TouchableOpacity
-							style={styles.createWalletButton}
-							onPress={handleCreateWallet}
-						>
-							<Typo color={colors.white} fontWeight="600">
-								Create a Wallet
-							</Typo>
-						</TouchableOpacity>
-					</View>
-				) : (
-					<FlatList
-						data={wallets}
-						renderItem={renderWalletCard}
-						keyExtractor={(item) => item.id || ''}
-						contentContainerStyle={styles.listContainer}
-					/>
-				)}
-			</View>
-		</ScreenWrapper>
-	)
-}
-
-export default WalletScreen
+export default Wallet;
 
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		paddingHorizontal: spacingX._20,
-	},
-	header: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'center',
-		marginVertical: spacingY._20,
-	},
-	addButton: {
-		backgroundColor: colors.primary,
-		width: 40,
-		height: 40,
-		borderRadius: 20,
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	emptyContainer: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	emptyText: {
-		marginVertical: spacingY._15,
-	},
-	createWalletButton: {
-		backgroundColor: colors.primary,
-		paddingVertical: spacingY._12,
-		paddingHorizontal: spacingX._20,
-		borderRadius: 10,
-		marginTop: spacingY._10,
-	},
-	listContainer: {
-		paddingBottom: 100, // For TabBar
-	},
-	walletCard: {
-		backgroundColor: colors.text,
-		borderRadius: 16,
-		padding: spacingY._15,
-		marginBottom: spacingY._15,
-		elevation: 2,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.1,
-		shadowRadius: 2,
-	},
-	selectedWallet: {
-		borderWidth: 2,
-		borderColor: colors.primary,
-	},
-	walletHeader: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		marginBottom: spacingY._10,
-	},
-	walletIcon: {
-		backgroundColor: colors.neutral200,
-		borderRadius: 8,
-		width: 40,
-		height: 40,
-		justifyContent: 'center',
-		alignItems: 'center',
-		marginRight: spacingX._10,
-	},
-	walletBalance: {
-		marginBottom: spacingY._15,
-	},
-	walletStats: {
-		flexDirection: 'row',
-		borderTopWidth: 1,
-		borderTopColor: colors.neutral200,
-		paddingTop: spacingY._10,
-	},
-	statItem: {
-		flex: 1,
-		alignItems: 'center',
-	},
-})
+  listStyle: {
+    paddingVertical: spacingY._25,
+    paddingTop: spacingY._15,
+  },
+  wallets: {
+    flex: 1,
+    backgroundColor: colors.neutral900,
+    borderTopRightRadius: radius._30,
+    borderTopLeftRadius: radius._30,
+    padding: spacingX._20,
+    paddingTop: spacingY._15,
+  },
+  flexRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: spacingY._10,
+  },
+  balaceView: {
+    height: verticalScale(160),
+    backgroundColor: colors.black,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  container: {
+    flex: 1,
+    justifyContent: "space-between",
+  },
+});

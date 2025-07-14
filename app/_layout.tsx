@@ -1,16 +1,35 @@
 import { AuthProvider } from "@/contexts/authContext";
-import { WalletProvider } from "@/contexts/wallet";
 import { Stack } from "expo-router";
 import React from "react";
 
 const StackLayout = () => {
   return (
     <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="index" />
       <Stack.Screen
         name="(modals)/profileModal"
-        options={{ presentation: "modal" }}
+        options={{
+          presentation: "modal",
+        }}
       />
-      <Stack.Screen name="(transactions)/addTransaction" />
+      <Stack.Screen
+        name="(modals)/walletModal"
+        options={{
+          presentation: "modal",
+        }}
+      />
+      <Stack.Screen
+        name="(modals)/transactionModal"
+        options={{
+          presentation: "modal",
+        }}
+      />
+      <Stack.Screen
+        name="(modals)/searchModal.tsx"
+        options={{
+          presentation: "modal",
+        }}
+      />
     </Stack>
   );
 };
@@ -18,9 +37,7 @@ const StackLayout = () => {
 export default function RootLayout() {
   return (
     <AuthProvider>
-      <WalletProvider>
-        <StackLayout />
-      </WalletProvider>
+      <StackLayout />
     </AuthProvider>
   );
 }
