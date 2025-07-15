@@ -5,15 +5,22 @@ import React from "react";
 const StackLayout = () => {
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="index" />
+      <Stack.Screen name="index" options={{}} />
       <Stack.Screen
-        name="(modals)/profileModal"
+        name="(modals)/searchModal"
+        options={{
+          presentation: "modal",
+          // freezeOnBlur: true,
+        }}
+      />
+      <Stack.Screen
+        name="(modals)/settingsModal"
         options={{
           presentation: "modal",
         }}
       />
       <Stack.Screen
-        name="(modals)/walletModal"
+        name="(modals)/profileModal"
         options={{
           presentation: "modal",
         }}
@@ -25,7 +32,7 @@ const StackLayout = () => {
         }}
       />
       <Stack.Screen
-        name="(modals)/searchModal.tsx"
+        name="(modals)/walletModal"
         options={{
           presentation: "modal",
         }}
