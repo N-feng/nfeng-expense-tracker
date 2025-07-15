@@ -14,11 +14,13 @@ export type ScreenWrapperProps = {
   style?: ViewStyle;
   children: React.ReactNode;
 };
+
 export type ModalWrapperProps = {
   style?: ViewStyle;
   children: React.ReactNode;
   bg?: string;
 };
+
 export type accountOptionType = {
   title: string;
   icon: React.ReactNode;
@@ -81,6 +83,7 @@ export type CategoryType = {
   icon: Icon;
   bgColor: string;
 };
+
 export type ExpenseCategoriesType = {
   [key: string]: CategoryType;
 };
@@ -103,8 +106,6 @@ export interface InputProps extends TextInputProps {
   containerStyle?: ViewStyle;
   inputStyle?: TextStyle;
   inputRef?: React.RefObject<TextInput>;
-  //   label?: string;
-  //   error?: string;
 }
 
 export interface CustomButtonProps extends TouchableOpacityProps {
@@ -124,7 +125,7 @@ export type ImageUploadProps = {
 };
 
 export type UserType = {
-  uid?: string;
+  uid: string;
   email?: string | null;
   name: string | null;
   image?: any;
@@ -165,4 +166,15 @@ export type WalletType = {
   image: any;
   uid?: string;
   created?: Date;
+  imagePublicId?: string | null;
+};
+
+export type BudgetType = {
+  id?: string;
+  uid: string;
+  walletId: string;
+  category: string;
+  limit: number;
+  period: string;
+  created?: Date | Timestamp;
 };

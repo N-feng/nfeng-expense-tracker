@@ -1,14 +1,13 @@
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React from "react";
+import Typo from "./Typo";
+import { verticalScale } from "@/utils/styling";
 import { colors, radius, spacingX } from "@/constants/theme";
 import { WalletType } from "@/types";
-import { formatRupiah } from "@/utils/currency";
-import { verticalScale } from "@/utils/styling";
-import { Image } from "expo-image";
 import { Router } from "expo-router";
-import * as Icons from "phosphor-react-native";
-import React from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import Typo from "./Typo";
+import { Image } from "expo-image";
+import * as Icons from "phosphor-react-native";
 
 const WalletListItem = ({
   item,
@@ -19,7 +18,7 @@ const WalletListItem = ({
   index: number;
   router: Router;
 }) => {
-  const openWallet = () => {
+  const handleOpen = () => {
     router.push({
       pathname: "/(modals)/walletModal",
       params: {
@@ -29,34 +28,36 @@ const WalletListItem = ({
       },
     });
   };
-
   return (
     <Animated.View
       entering={FadeInDown.delay(index * 50)
         .springify()
         .damping(13)}
     >
-      <TouchableOpacity style={styles.container} onPress={openWallet}>
+      <TouchableOpacity style={styles.container} onPress={handleOpen}>
         <View style={styles.imageContainer}>
           <Image
             style={{ flex: 1 }}
-            source={item?.image}
+            source={item.image}
             contentFit="cover"
             transition={100}
           />
         </View>
+
         <View style={styles.nameContainer}>
-          <Typo size={16}>{item?.name}</Typo>
+          <Typo size={16}>{item.name}</Typo>
           <Typo size={14} color={colors.neutral400}>
-            {formatRupiah(item?.amount || 0)}
+            ${item?.amount?.toFixed(2) || 0}
           </Typo>
         </View>
 
+        {/* <TouchableOpacity> */}
         <Icons.CaretRight
           size={verticalScale(20)}
           weight="bold"
           color={colors.white}
         />
+        {/* </TouchableOpacity> */}
       </TouchableOpacity>
     </Animated.View>
   );
@@ -69,6 +70,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: verticalScale(17),
+    // padding: spacingX._15,
   },
   imageContainer: {
     height: verticalScale(45),

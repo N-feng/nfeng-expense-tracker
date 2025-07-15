@@ -6,7 +6,6 @@ import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import { useAuth } from "@/contexts/authContext";
 import useFetchData from "@/hooks/useFetchData";
 import { WalletType } from "@/types";
-import { formatRupiah } from "@/utils/currency";
 import { verticalScale } from "@/utils/styling";
 import { useRouter } from "expo-router";
 import { orderBy, where } from "firebase/firestore";
@@ -28,19 +27,16 @@ const Wallet = () => {
   ]);
 
   const getTotalBalance = () =>
-    wallets.reduce((total, item) => {
-      total = total + (item.amount || 0);
-      return total;
-    }, 0);
+    wallets.reduce((total, item) => total + (item.amount || 0), 0);
 
   return (
     <ScreenWrapper style={{ backgroundColor: colors.black }}>
       <View style={styles.container}>
         {/* balance view */}
-        <View style={styles.balaceView}>
+        <View style={styles.balanceView}>
           <View style={{ alignItems: "center" }}>
             <Typo size={45} fontWeight={"500"}>
-              {formatRupiah(getTotalBalance())}
+              ${getTotalBalance()?.toFixed(2)}
             </Typo>
             <Typo size={16} color={colors.neutral300}>
               Total Balance
@@ -85,17 +81,15 @@ const Wallet = () => {
 export default Wallet;
 
 const styles = StyleSheet.create({
-  listStyle: {
-    paddingVertical: spacingY._25,
-    paddingTop: spacingY._15,
-  },
-  wallets: {
+  container: {
     flex: 1,
-    backgroundColor: colors.neutral900,
-    borderTopRightRadius: radius._30,
-    borderTopLeftRadius: radius._30,
-    padding: spacingX._20,
-    paddingTop: spacingY._15,
+    justifyContent: "space-between",
+  },
+  balanceView: {
+    height: verticalScale(160),
+    backgroundColor: colors.black,
+    justifyContent: "center",
+    alignItems: "center",
   },
   flexRow: {
     flexDirection: "row",
@@ -103,14 +97,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: spacingY._10,
   },
-  balaceView: {
-    height: verticalScale(160),
-    backgroundColor: colors.black,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  container: {
+  wallets: {
     flex: 1,
-    justifyContent: "space-between",
+    backgroundColor: colors.neutral900,
+    borderTopRightRadius: radius._30,
+    borderTopLeftRadius: radius._30,
+    padding: spacingX._20,
+    paddingTop: spacingX._25,
+  },
+  listStyle: {
+    paddingVertical: spacingY._25,
+    paddingTop: spacingY._15,
   },
 });
